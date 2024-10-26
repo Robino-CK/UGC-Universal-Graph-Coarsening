@@ -55,7 +55,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 import utils
 import GCN
 import spectral_properties
-import FACH_bin_widths
+import UGC_bin_widths
 import GraphSage
 import GAT
 import GIN
@@ -132,14 +132,14 @@ def hashed_values(data, no_of_hash,feature_size,function,out_of_sample,projector
 def allocate_list_bin_width(dataset_name,ratio_list,hash_function,scatter_alphabets):
   if scatter_alphabets == 'None':
     key = dataset_name + '_' + hash_function
-    full_bin_width_list =  FACH_bin_widths.BIN_WIDTH_DICTONARY[key] 
+    full_bin_width_list =  UGC_bin_widths.BIN_WIDTH_DICTONARY[key] 
     list_bin_width = []
     for ratio in ratio_list:
       key = (str)(ratio)
       list_bin_width.append(full_bin_width_list[key]) 
   else:
      list_bin_width = [0.3]
-  print(list_bin_width)
+  # print(list_bin_width)
   return list_bin_width
 
 def partition(list_bin_width,Bin_values,no_of_hash):
@@ -763,14 +763,6 @@ if __name__ == "__main__":
               P_hat[y,x] = 1
               zero_list[x] = zero_list[x] and (not (data.train_mask)[y])
       
-      # for row in P_hat:
-      #   print(row)
-      
-      # print("check missclassified")
-      # print(data.y)
-      # missclassified = utils.detect_missclassified(P_hat,data.y)
-      # print(missclassified)
-      
       P_hat = P_hat.to_sparse()
       #dividing by number of elements in each supernode to get average value 
       P = torch.sparse.mm(P_hat,(torch.diag(torch.pow(C_diag, -1/2))))
@@ -1001,7 +993,7 @@ if __name__ == "__main__":
           model = GraphSage.GraphSAGE(feature_size, hidden_units, num_classes)
         elif args.model_type == 'gat':
           model = GAT.GAT(feature_size, hidden_units, num_classes)
-        elif args.model_type == 'appnp_gcn':
+        elif args.model_type == 'ugc':
           model = APPNP.Net(feature_size, hidden_units, num_classes)
         elif args.model_type == '3wl':
           model = WL_base_model.WL_BaseModel(feature_size, hidden_units, num_classes)
