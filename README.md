@@ -1,5 +1,5 @@
 # UGC-Universal-Graph-Coarsening
-This is the official repository of [UGC]([https://nips.cc/virtual/2024/poster/93695]): Universal Graph Coarsening accepted in 38 Conference on Neural Information Processing Systems ( [NeurIPS24]([https://www.genome.gov/](https://neurips.cc/Conferences/2024/CallForPapers)), held at the Vancouver Convention Center.
+This is the official repository of [UGC](https://nips.cc/virtual/2024/poster/93695): Universal Graph Coarsening accepted in 38 Conference on Neural Information Processing Systems ( [NeurIPS24](https://neurips.cc/Conferences/2024/CallForPapers)), held at the Vancouver Convention Center.
 
 
 ## Dependencies
