@@ -13,7 +13,7 @@ UGC is a graph coarsening framework. Inspired by Locality Sensitive Hashing (LSH
 Install required dependencies from requirement.txt file.
 
 ## Run
-- UGC is model agnostic and as of now supports Vanilla GCN, GraphSage, GIN, GAT, APPNP GCN and 3WL gnn models.
+- UGC is model agnostic and currently supports Vanilla GCN, GraphSage, GIN, GAT, APPNP GCN and 3WL gnn models.
 - Experiments includes both homophilic and heterophilic datasets.
 
 To run UGC use run.sh file.
