@@ -14,7 +14,7 @@ python UGC.py --dataset=cora --model_type=gcn --ratio=50 --add_adj_to_node_featu
 ### GCN used in UGC 
 python UGC.py --dataset=cora --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.19
 
-### Implemented for NeurIPS rebuttal 3wl
+### 3wl
 python UGC.py --dataset=cora --model_type=3wl --ratio=50 --add_adj_to_node_features=True --alpha=0.19
 
 ### Graph Sage
