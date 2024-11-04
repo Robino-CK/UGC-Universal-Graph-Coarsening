@@ -18,20 +18,12 @@ Install required dependencies from requirement.txt file.
 
 To run UGC use run.sh file.
 
-python UGC.py --dataset=cora --model_type=gcn --ratio=50 --add_adj_to_node_features=True --alpha=0.19
-
-python UGC.py --dataset=dblp --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.18
-
-python UGC.py --dataset=pubmed --model_type=3wl --ratio=50 --add_adj_to_node_features=True --alpha=0.20
-
-python UGC.py --dataset=physics --model_type=sage --ratio=50 --add_adj_to_node_features=True --alpha=0.07
-
-python UGC.py --dataset=squirrel --model_type=gat --ratio=50 --add_adj_to_node_features=True --alpha=0.78
-
-python UGC.py --dataset=chameleon --model_type=gin --ratio=50 --add_adj_to_node_features=True --alpha=0.75
-
-python UGC.py --dataset=texas --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.91
-
-python UGC.py --dataset=film --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.78
-
-python UGC.py --dataset=cornell --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.70
+- python UGC.py --dataset=cora --model_type=gcn --ratio=50 --add_adj_to_node_features=True --alpha=0.19
+- python UGC.py --dataset=dblp --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.18
+- python UGC.py --dataset=pubmed --model_type=3wl --ratio=50 --add_adj_to_node_features=True --alpha=0.20
+- python UGC.py --dataset=physics --model_type=sage --ratio=50 --add_adj_to_node_features=True --alpha=0.07
+- python UGC.py --dataset=squirrel --model_type=gat --ratio=50 --add_adj_to_node_features=True --alpha=0.78
+- python UGC.py --dataset=chameleon --model_type=gin --ratio=50 --add_adj_to_node_features=True --alpha=0.75
+- python UGC.py --dataset=texas --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.91
+- python UGC.py --dataset=film --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.78
+- python UGC.py --dataset=cornell --model_type=ugc --ratio=50 --add_adj_to_node_features=True --alpha=0.70
