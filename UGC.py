@@ -39,6 +39,7 @@ import os
 import json
 import scipy as sp
 from scipy.sparse import csr_matrix
+from collections import Counter
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -148,13 +149,19 @@ def partition(list_bin_width,Bin_values,no_of_hash):
     for bin_width in list_bin_width:
         bias = torch.tensor([random.uniform(-bin_width, bin_width) for i in range(no_of_hash)])#.to(device)
         temp = torch.floor((1/bin_width)*(Bin_values + bias))#.to(device)
-        # print(temp)
-        cluster, _ = torch.max(temp, dim = 1)
-        # print(cluster)
+
+        min_value = torch.min(temp)
+        max_value = torch.max(temp)
+        chunks = np.arange(min_value, max_value + bin_width, bin_width)  #Creating bins with size r
+        chunk_indices = np.digitize(temp, chunks) - 1  
         dict_hash_indices = {}
-        no_nodes = Bin_values.shape[0]
-        for i in range(no_nodes):
-            dict_hash_indices[i] = int(cluster[i]) #.to('cpu')
+        i = 0
+        for row in chunk_indices:
+            counts = Counter(row)
+            most_common_chunk = counts.most_common(1)[0][0]
+            dict_hash_indices[i] = most_common_chunk
+            i = i + 1
+        
         summary_dict[bin_width] = dict_hash_indices 
     return summary_dict
 
