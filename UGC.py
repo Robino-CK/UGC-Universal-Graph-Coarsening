@@ -75,7 +75,7 @@ def parse_args():
     parser.add_argument('--lr',type=float,required=False,default=0.003,help="Learning Rate")
     parser.add_argument('--decay',type=float,required=False,default=0.0005,help="Learning Rate Decay")
     parser.add_argument('--seed',type=int,required=False,default=42,help="Seed")
-    parser.add_argument('--ratio',type=int,required=False,default=30,help='reduction ratio list, example (30,50,70)')
+    parser.add_argument('--ratio',type=int,required=False,default=50,help='reduction ratio list, example (30,50,70)')
     parser.add_argument('--dataset_not_in_torch_geometric',type=bool,required=False,default=False,help='Turn true if your dataset is not in the torch geometric. We will create geometric dataset first')
     parser.add_argument('--num_classes',type=int,required=False,default=-1,help='You should give value here if new instance of torch_geometric dataset is being created.')
     parser.add_argument('--number_of_projectors',type=int,required=False,default=500,help='Total number of projectors we want while Doing LSH.')
@@ -151,7 +151,6 @@ def partition(list_bin_width,Bin_values,no_of_hash):
         temp = torch.floor((1/bin_width)*(Bin_values + bias))#.to(device)
 
         cluster, _ = torch.mode(temp, dim = 1)
-        print(cluster)
         dict_hash_indices = {}
         no_nodes = Bin_values.shape[0]
         for i in range(no_nodes):
@@ -777,7 +776,7 @@ if __name__ == "__main__":
           for y in dict_blabla[x]:
               P_hat[y,x] = 1
               zero_list[x] = zero_list[x] and (not (data.train_mask)[y])
-      
+            
       P_hat = P_hat.to_sparse()
       #dividing by number of elements in each supernode to get average value 
       P = torch.sparse.mm(P_hat,(torch.diag(torch.pow(C_diag, -1/2))))

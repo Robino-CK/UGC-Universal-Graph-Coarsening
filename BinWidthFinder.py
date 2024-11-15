@@ -51,17 +51,12 @@ def clustering(data, no_of_hash, bin_width, function, projectors_distribution,fe
   else:
     Bin_values = torch.floor((1/bin_width)*(torch.cdist(features, Wl, p = 2) + bias)).to(device)
 
-  min_value = torch.min(Bin_values)
-  max_value = torch.max(Bin_values)
-  chunks = np.arange(min_value, max_value + bin_width, bin_width)  #Creating bins with size r
-  chunk_indices = np.digitize(Bin_values, chunks) - 1  
+  cluster, _ = torch.mode(Bin_values, dim = 1)
   dict_hash_indices = {}
-  i = 0
-  for row in chunk_indices:
-      counts = Counter(row)
-      most_common_chunk = counts.most_common(1)[0][0]
-      dict_hash_indices[i] = most_common_chunk
-      i = i + 1
+  no_nodes = Bin_values.shape[0]
+  for i in range(no_nodes):
+      dict_hash_indices[i] = int(cluster[i]) #.to('cpu')
+  dict_hash_indices[bin_width] = dict_hash_indices 
 
   return dict_hash_indices
 
