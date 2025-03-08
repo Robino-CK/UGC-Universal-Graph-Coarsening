@@ -1048,10 +1048,10 @@ if __name__ == "__main__":
             # print(data.edge_attr.dtype)
             val_acc = val(model,data)
 
-            import dill as pickle  # Use dill instead of pickle
+            #import dill as pickle  # Use dill instead of pickle
             if best_val_acc < val_acc:
-                with open("model.pkl", "wb") as f:
-                  pickle.dump(model, f) 
+                #with open("model.pkl", "wb") as f:
+               #   pickle.dump(model, f) 
                 #torch.save(model, 'best_model.pt')
                 best_val_acc = val_acc
                 best_epoch = epoch
@@ -1062,7 +1062,7 @@ if __name__ == "__main__":
         time6 = time.time()
         print('diff b/w t6 and t5 {}'.format(time6-time5))
         time_taken_to_train_gcn.append(time6-time5)
-        model = pickle.load('best_model.pkl')
+        #model = pickle.load('best_model.pkl')
         model.eval()
         data = data.to(device)
         
