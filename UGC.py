@@ -29,7 +29,11 @@ from torch_geometric.datasets import AmazonProducts
 from torch_geometric.datasets import KarateClub
 from torch_geometric.datasets import AMiner
 from torch_geometric.datasets import OGB_MAG
+from torch_geometric.datasets import DBLP
+
 from sklearn.neighbors import NearestNeighbors
+
+
 
 from sklearn.model_selection import train_test_split
 from scipy.sparse import csr_matrix
@@ -61,6 +65,7 @@ import GraphSage
 import GAT
 import GIN
 import APPNP_GCN as APPNP
+import HGCN
 import WL_base_model
 
 def parse_args():
@@ -503,7 +508,7 @@ if __name__ == "__main__":
     elif args.dataset == 'AMiner':
       # Heterogenous data
       dataset = AMiner(root = 'data/AMiner')
-    
+      
     elif args.dataset == 'OGB_MAG':
     # Heterogenous data
       dataset = OGB_MAG(root='./data', preprocess='metapath2vec')
@@ -534,7 +539,10 @@ if __name__ == "__main__":
     
     elif args.dataset == 'dblp':
       dataset = CitationFull(root = 'newdata/DBLP', name = 'DBLP')
-
+    
+    elif args.dataset == 'dblp-h':
+      dataset = DBLP(root="newdata/real_DBLP")
+      
     elif args.dataset == 'cs':
       dataset = Coauthor(root = 'data/CS', name = 'CS')
 
@@ -1011,6 +1019,8 @@ if __name__ == "__main__":
           model = APPNP.Net(feature_size, hidden_units, num_classes)
         elif args.model_type == '3wl':
           model = WL_base_model.WL_BaseModel(feature_size, hidden_units, num_classes)
+        elif args.model_type == 'HGCN':
+          model = HGCN.HGCN_(feature_size, hidden_units, num_classes)
         else:
           model = GCN.GCN_(feature_size, hidden_units, num_classes)
 
