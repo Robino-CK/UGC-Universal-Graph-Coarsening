@@ -1014,7 +1014,7 @@ if __name__ == "__main__":
         else:
           model = GCN.GCN_(feature_size, hidden_units, num_classes)
 
-        device = 'cuda'
+        
         model = model.to(device)
         data = data.to(device)
         data_coarsen = data_coarsen.to(device)
@@ -1048,8 +1048,11 @@ if __name__ == "__main__":
             # print(data.edge_attr.dtype)
             val_acc = val(model,data)
 
+            import dill as pickle  # Use dill instead of pickle
             if best_val_acc < val_acc:
-                torch.save(model, 'best_model.pt')
+                with open("model.pkl", "wb") as f:
+                  pickle.dump(model, f) 
+                #torch.save(model, 'best_model.pt')
                 best_val_acc = val_acc
                 best_epoch = epoch
           
@@ -1059,7 +1062,7 @@ if __name__ == "__main__":
         time6 = time.time()
         print('diff b/w t6 and t5 {}'.format(time6-time5))
         time_taken_to_train_gcn.append(time6-time5)
-        model = torch.load('best_model.pt')
+        model = pickle.load('best_model.pkl')
         model.eval()
         data = data.to(device)
         
