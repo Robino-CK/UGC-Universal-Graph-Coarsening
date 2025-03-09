@@ -50,7 +50,7 @@ class ImprovedHeteroGNN(torch.nn.Module):
                 conv_dict[edge_type] = SAGEConv(
                     hidden_channels, 
                     hidden_channels, 
-                    add_self_loops=False,
+                 #   add_self_loops=False,
                     normalize=True
                 )
             self.convs.append(HeteroConv(conv_dict, aggr='mean'))
