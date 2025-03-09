@@ -9,13 +9,7 @@ dataset_hetero = DBLP(root="newdata/real_DBLP")
 #data_hetero = dataset[0]
 
 
-# In[21]:
-
-
-dataset_hetero[0]["author"]["train_mask"]
-
-
-# In[3]:
+# In[2]:
 
 
 import hetero_ugc
@@ -25,39 +19,27 @@ coarsend_graph , projection= hetero_ugc.hetero_coarsen(dataset_hetero)
 coarsend_graph.validate()
 
 
-# In[5]:
-
-
-projection
-
-
-# In[ ]:
-
-
-
-
-
-# In[7]:
+# In[3]:
 
 
 inverse_mapping = {}
 for type, p in projection.items():
     inverse_mapping[type] = {}
     for key, value in p.items():
-        if value not in inverse_mapping:
-            inverse_mapping[value] = [key]
+        if value not in inverse_mapping[type]:
+            inverse_mapping[type][value] = [key]
         else:
-            inverse_mapping[value].append(key) 
+            inverse_mapping[type][value].append(key) 
 
 
-# In[8]:
+# In[4]:
 
 
 original_data = dataset_hetero[0]
 coarsened_data = coarsend_graph
 
 
-# In[24]:
+# In[5]:
 
 
 import torch
@@ -132,7 +114,7 @@ coarsened_data = create_train_val_test_masks(coarsened_data, train_ratio=0.1, va
 coarsend_graph
 
 
-# In[ ]:
+# In[6]:
 
 
 # Import necessary libraries (if not already imported)
@@ -206,7 +188,6 @@ def apply_inversion_mapping(coarsened_pred, inversion_map, original_labels):
     """
     correct_count = 0
     total_count = 0
-    
     for coarse_node, orig_nodes in inversion_map.items():
         coarse_pred = coarsened_pred[coarse_node].item()
         
@@ -282,7 +263,7 @@ def test_coarsened():
         # Apply inversion mapping to evaluate how coarsened predictions map to original graph
         inverted_acc  = apply_inversion_mapping(
             pred,
-            inverse_mapping,
+            inverse_mapping["author"],
             original_data['author'].y
         )
         
