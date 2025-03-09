@@ -281,10 +281,10 @@ def test_coarsened():
         
         # Apply inversion mapping to evaluate how coarsened predictions map to original graph
         inverted_acc  = apply_inversion_mapping(
-            #pred,
-            #inverse_mapping,
-            #original_data['author'].y
-        #)
+            pred,
+            inverse_mapping,
+            original_data['author'].y
+        )
         
         return coarsened_acc, inverted_acc
 
