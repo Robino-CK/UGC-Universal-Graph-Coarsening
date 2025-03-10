@@ -15,6 +15,27 @@ from UGC import allocate_list_bin_width
 from torch_geometric.data import Data
 import torch
 
+def assign_majority_labels(node_mapping, original_y_labels):
+    new_node_labels = torch.zeros(len(node_mapping))
+    
+    for new_node, original_nodes in node_mapping.items():
+        # Get y labels for all original nodes that map to this new node
+        y_values = [original_y_labels[orig_node] for orig_node in original_nodes]
+        
+        # Count occurrences of each y value
+        value_counts = {}
+        for y in y_values:
+            value_counts[y] = value_counts.get(y, 0) + 1
+        
+        # Find the majority (most frequent) y value
+        majority_y = max(value_counts.items(), key=lambda x: x[1])[0]
+        
+        # Assign to the new node
+        new_node_labels[new_node] = majority_y
+        new_node_labels = new_node_labels.long()
+        
+    return new_node_labels
+
 def merge_nodes(data, summary_dict, list_bin_width, device):
     
     for bin_width in list_bin_width:
@@ -82,18 +103,16 @@ def merge_nodes(data, summary_dict, list_bin_width, device):
         # exit(1)
         #------------------
         if not data.y is None:
-            num_classes = len(np.unique(data.y.numpy()))
-    
-            Y = np.array(data.y.cpu())
-            Y = utils.one_hot(Y,num_classes)#.to(device)
-            Y[~data.train_mask] = torch.Tensor([0 for _ in range(num_classes)])#.to(device)
-            labels_coarse = torch.argmax(torch.sparse.mm(torch.t(P).double() , Y.double()).double() , 1)#.to(device)
+            labels_coarse = assign_majority_labels(dict_blabla, data.y)
+            #Y = utils.one_hot(Y,num_classes)#.to(device)
+    #        Y[~data.train_mask] = torch.Tensor([0 for _ in range(num_classes)])#.to(device)
+     #       labels_coarse = torch.argmax(torch.sparse.mm(torch.t(P).double() , Y.double()).double() , 1)#.to(device)
     
             data_coarsen = Data(x=cor_feat, edge_index = edge_index_corsen, y = labels_coarse)
         else:
             data_coarsen = Data(x=cor_feat, edge_index = edge_index_corsen)
             
-        data_coarsen.edge_attr = edge_features
+        #data_coarsen.edge_attr = edge_features
         projection = {}
         for key, value in dict_blabla.items():
             for v in value:
@@ -118,7 +137,7 @@ def coarsen_graph(data):
     A = to_dense_adj(data.edge_index, edge_attr= data.edge_attr)[0]
     Bin_values = hashed_values(data, no_of_hash, feature_size, h_function, out_of_sample, projectors_distribution, A) 
     dataset_name = 'cora'
-    ratio = 50
+    ratio = 70
     scatter_alphabets = 'None'
     list_bin_width = allocate_list_bin_width(dataset_name,[ratio],h_function,scatter_alphabets)
     summary_dict = partition(list_bin_width, Bin_values, no_of_hash) # projection map
@@ -227,7 +246,7 @@ def reconstruct_heterogeneous_graph(original_hetero_data, merged_graphs, node_ma
     
     return new_hetero_data
 
-def hetero_coarsen(dataset_hetero):
+def hetero_coarsen(dataset_hetero, testing = True):
     
     # Add meta-paths to your data
     data = dataset_hetero[0]
@@ -235,8 +254,13 @@ def hetero_coarsen(dataset_hetero):
     metapaths = [
         [("paper", "conference"), ("conference", "paper")],
         [("author", "paper"), ("paper", "author")],
+        [("author", "paper"),("paper", "term"), ("term","paper") , ("paper", "author")],
+        [("author", "paper"),("paper", "conference"), ("conference","paper"), ("paper", "author")],
+        
         [("conference", "paper"), ("paper", "conference")],
+        
         [("term", "paper"), ("paper", "term")],
+        [("term", "paper"),("paper", "author"), ("author", "paper") ,("paper", "term")]
     ]
     data_with_metapaths = AddMetaPaths(metapaths)(data.clone())
     # Create a new HeteroData object
@@ -300,7 +324,8 @@ def hetero_coarsen(dataset_hetero):
     coarsend_graphs = {}
     mappings = {}
     for ty, graph in homogeneous_graphs.items():
-        if ty in ["paper", "term"]:
+        print(ty)
+        if ty in ["paper", "term"] and testing:
             g = graph
             map = {i: i for i in range(graph.num_nodes)}
         else:

@@ -67,7 +67,7 @@ import GIN
 import APPNP_GCN as APPNP
 import HGCN
 import WL_base_model
-
+torch.manual_seed(12)
 def parse_args():
     parser = argparse.ArgumentParser(description='Coarsened Graph Training')
     parser.add_argument('--full_dataset',type=bool,required=False,default=False,help="Checking accuracy on original dataset.")
@@ -103,7 +103,6 @@ def parse_args():
     return args
 
 def hashed_values(data, no_of_hash,feature_size,function,out_of_sample,projectors_distribution,A):
-
   if projectors_distribution == 'VAEs':
     print("some random intilization is given here for mean and sigma make sure these contain learned values")
     learned_mean = -0.0017
@@ -150,7 +149,6 @@ def allocate_list_bin_width(dataset_name,ratio_list,hash_function,scatter_alphab
 
 def partition(list_bin_width,Bin_values,no_of_hash):
     summary_dict = {}
-    print(list_bin_width)
     for bin_width in list_bin_width:
         bias = torch.tensor([random.uniform(-bin_width, bin_width) for i in range(no_of_hash)])#.to(device)
         temp = torch.floor((1/bin_width)*(Bin_values + bias))#.to(device)
@@ -443,7 +441,7 @@ if __name__ == "__main__":
 
   time1 = time.time()  
   args = parse_args()
-  utils.fix_seeds(args.seed)
+  #utils.fix_seeds(args.seed)
   device = torch.device("cpu")
   torch.cuda.empty_cache()
 
@@ -629,8 +627,11 @@ if __name__ == "__main__":
 
     # print('average_distance of Euclidean distances:', average_distance)
 
-
-  if args.dataset not in ['karate', 'chameleon', 'squirrel', 'texas', 'cornell', 'film']:
+  if args.dataset == "dblp-h":
+    data = dataset[0]
+    num_classes = len((dataset[0]["author"].y).unique())
+    
+  elif args.dataset not in ['karate', 'chameleon', 'squirrel', 'texas', 'cornell', 'film']:
     data = dataset[0]    
     num_classes = dataset.num_classes
     feature_size = dataset.num_features
@@ -692,7 +693,7 @@ if __name__ == "__main__":
 
     # ###-----------------------
 
-
+  
   if args.add_adj_to_node_features == True:
       data.x = (1-args.alpha)*data.x
       g_adj = to_dense_adj(data.edge_index, edge_attr= data.edge_attr)[0]
@@ -742,15 +743,19 @@ if __name__ == "__main__":
   ###
 
   time2 = time.time()
-  
+  #print(to_dense_adj(data.edge_index, edge_attr= data.edge_attr)[0].shape)
+  #print(projectors_distribution)
+  #print(no_of_hash)
   # Bin_values = hashed_values(data, no_of_hash, feature_size,hash_function,out_of_sample,projectors_distribution)  
+
+  print(to_dense_adj(data.edge_index, edge_attr= data.edge_attr)[0])
   Bin_values = hashed_values(data, no_of_hash, feature_size,hash_function,out_of_sample,projectors_distribution,to_dense_adj(data.edge_index, edge_attr= data.edge_attr)[0])  
-  
+#  print(Bin_values)
   time3 = time.time()
   
   
   list_bin_width = allocate_list_bin_width(args.dataset,[args.ratio],args.hash_function,args.scatter_alphabets)
-  
+  print("hi", list_bin_width)
   summary_dict = {}
   summary_dict = partition(list_bin_width,Bin_values,no_of_hash)
   temp_time4 = time.time()
@@ -922,6 +927,7 @@ if __name__ == "__main__":
       del v
 
       data_coarsen = Data(x=cor_feat, edge_index = edge_index_corsen, y = labels_coarse)
+      
       data_coarsen.edge_attr = edge_features
 
       #### neurIPS rebuttal
@@ -1008,6 +1014,7 @@ if __name__ == "__main__":
         learning_rate = args.lr
         decay = args.decay
         epochs = args.epochs
+        data = data.to(device)
         
         if args.model_type == 'gin':
            model = GIN.GIN(feature_size, hidden_units, num_classes)
@@ -1020,13 +1027,13 @@ if __name__ == "__main__":
         elif args.model_type == '3wl':
           model = WL_base_model.WL_BaseModel(feature_size, hidden_units, num_classes)
         elif args.model_type == 'HGCN':
-          model = HGCN.HGCN_(feature_size, hidden_units, num_classes)
+          model = HGCN.HeteroGNN(metadata=data.metadata(), hidden_channels=64)
         else:
           model = GCN.GCN_(feature_size, hidden_units, num_classes)
 
         
         model = model.to(device)
-        data = data.to(device)
+        
         data_coarsen = data_coarsen.to(device)
         edge_weight = torch.ones(data_coarsen.edge_index.size(1))
         decay = decay
@@ -1039,6 +1046,11 @@ if __name__ == "__main__":
               out = model(data_coarsen.x, data_coarsen.edge_index)
             elif args.model_type == '3wl':
                out = model(data_coarsen.x)
+            elif args.model_type == 'hgcn':
+              x_dict = data.x_dict
+              x_dict.update({"conference": torch.zeros((data["conference"]["num_nodes"], 1))})
+
+              out = model(x_dict, data.edge_index_dict)
             else:
               out = model(data_coarsen.x, data_coarsen.edge_index,data_coarsen.edge_attr.float())
 

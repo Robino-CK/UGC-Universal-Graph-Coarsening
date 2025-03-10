@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[12]:
 
 
 from torch_geometric.datasets import DBLP
@@ -9,17 +9,18 @@ dataset_hetero = DBLP(root="newdata/real_DBLP")
 #data_hetero = dataset[0]
 
 
-# In[2]:
+# In[13]:
 
 
 import hetero_ugc
+import torch
 import importlib
 importlib.reload(hetero_ugc)
 coarsend_graph , projection= hetero_ugc.hetero_coarsen(dataset_hetero)
-coarsend_graph.validate()
+#coarsend_graph.validate()
 
 
-# In[3]:
+# In[15]:
 
 
 inverse_mapping = {}
@@ -32,14 +33,23 @@ for type, p in projection.items():
             inverse_mapping[type][value].append(key) 
 
 
-# In[4]:
+# In[16]:
 
 
 original_data = dataset_hetero[0]
 coarsened_data = coarsend_graph
 
 
-# In[5]:
+# In[17]:
+
+
+# delete adjacency from coarsend features:
+for type in coarsened_data.node_types:
+    coarsened_data[type].x = coarsened_data[type].x[:, :original_data[type].num_features] 
+    
+
+
+# In[18]:
 
 
 import torch
@@ -114,7 +124,7 @@ coarsened_data = create_train_val_test_masks(coarsened_data, train_ratio=0.1, va
 coarsend_graph
 
 
-# In[6]:
+# In[19]:
 
 
 # Import necessary libraries (if not already imported)
